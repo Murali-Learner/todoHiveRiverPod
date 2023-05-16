@@ -12,3 +12,4 @@ final allTodoListProvider =
 final todoProvider = StateNotifierProvider<TodoStateNotifier, Todo>((ref) {
   return TodoStateNotifier(ref: ref);
 });
+final loadingProvider = StateProvider.autoDispose((ref) => false);

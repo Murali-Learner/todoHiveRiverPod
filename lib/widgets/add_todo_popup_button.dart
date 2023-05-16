@@ -16,7 +16,6 @@ class AddTodoPopupButton extends ConsumerWidget {
         if (DateTime.parse(todo.time).isAfter(DateTime.now())) {
           ref.read(todoProvider.notifier).createTodo();
           Navigator.pop(context);
-          ref.read(allTodoListProvider.notifier).getAllTodoList();
         } else {
           const snackBar = SnackBar(content: Text('Time should be in Future'));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);

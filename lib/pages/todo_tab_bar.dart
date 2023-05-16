@@ -9,15 +9,26 @@ import 'package:todo_riverpod/pages/todos_page.dart';
 import 'package:todo_riverpod/riverPods/stateNotifierProviders/stateNotifierProviders.dart';
 import 'package:todo_riverpod/widgets/add_todo_dialog.dart';
 
-class TodoTabBar extends ConsumerWidget {
-  TodoTabBar({Key? key}) : super(key: key);
+class TodoTabBar extends ConsumerStatefulWidget {
+  const TodoTabBar({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<TodoTabBar> createState() => TodoTabBarState();
+}
+
+class TodoTabBarState extends ConsumerState<TodoTabBar> {
+  @override
+  void initState() {
+    final listRef = ref.read(allTodoListProvider.notifier);
+    listRef.getAllTodoList();
+    super.initState();
+  }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    List<TodoCategories> allTodoList =
-        ref.watch(allTodoListProvider.notifier).getAllTodoList();
+  Widget build(BuildContext context) {
+    List<TodoCategories> allTodoList = ref.watch(allTodoListProvider);
 
     return DefaultTabController(
       length: 3,
@@ -30,29 +41,23 @@ class TodoTabBar extends ConsumerWidget {
                 : PreferredSize(
                     preferredSize: Size.fromHeight(
                         MediaQuery.of(context).size.height * 0.1),
-                    child: Consumer(builder: (context, refer, _) {
-                      return TabBar(
-                        onTap: (int tabIndex) {
-                          log("message $tabIndex");
-                          refer
-                              .read(allTodoListProvider.notifier)
-                              .getAllTodoList();
+                    child: TabBar(
+                      onTap: (int tabIndex) {
+                        ref.read(allTodoListProvider.notifier).getAllTodoList();
+                      },
+                      tabs: allTodoList.map(
+                        (TodoCategories todoCategories) {
+                          return TodoButton(
+                            todoCount: todoCategories.todoList.length,
+                            todoIcon: getTodoIcon(
+                              todoType: todoCategories.todoType,
+                            ),
+                            todoType: todoTypeString[todoCategories.todoType] ??
+                                "ALL",
+                          );
                         },
-                        tabs: allTodoList.map(
-                          (TodoCategories todoCategories) {
-                            return TodoButton(
-                              todoCount: todoCategories.todoList.length,
-                              todoIcon: getTodoIcon(
-                                todoType: todoCategories.todoType,
-                              ),
-                              todoType:
-                                  todoTypeString[todoCategories.todoType] ??
-                                      "ALL",
-                            );
-                          },
-                        ).toList(),
-                      );
-                    }),
+                      ).toList(),
+                    ),
                   ),
           ),
           floatingActionButton: FloatingActionButton(
@@ -63,21 +68,23 @@ class TodoTabBar extends ConsumerWidget {
             child: const Icon(Icons.add),
           ),
           body: allTodoList.isEmpty
-              ? const Center(child: Text("Please add Todos"))
-              : Consumer(builder: (context, refer, _) {
-                  List<TodoCategories> allTodos = refer
-                      .watch(allTodoListProvider.notifier)
-                      .getAllTodoList();
-                  return TabBarView(
-                    children: allTodos.map(
-                      (TodoCategories todoCategories) {
-                        return TodosPage(
-                          todoList: todoCategories.todoList,
-                        );
-                      },
-                    ).toList(),
-                  );
-                })),
+              ? const Center(child: CircularProgressIndicator.adaptive())
+              : allTodoList.first.todoList.isEmpty
+                  ? const Center(child: Text("Please add Todos"))
+                  : Consumer(builder: (context, refer, _) {
+                      List<TodoCategories> allTodos = refer
+                          .watch(allTodoListProvider.notifier)
+                          .getAllTodoList();
+                      return TabBarView(
+                        children: allTodos.map(
+                          (TodoCategories todoCategories) {
+                            return TodosPage(
+                              todoList: todoCategories.todoList,
+                            );
+                          },
+                        ).toList(),
+                      );
+                    })),
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:todo_riverpod/enums/todoEnum.dart';
 import 'package:todo_riverpod/helpers/hive_helper.dart';
 import 'package:todo_riverpod/models/todo_categories.dart';
 import 'package:todo_riverpod/models/todo_model.dart';
-import 'package:todo_riverpod/riverPods/stateNotifierProviders/stateNotifierProviders.dart';
 
 class TodoListStateNotifier extends StateNotifier<List<TodoCategories>> {
   final Ref ref;

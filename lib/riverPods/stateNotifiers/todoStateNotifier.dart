@@ -18,15 +18,15 @@ class TodoStateNotifier extends StateNotifier<Todo> {
 
   Random random = Random();
   void addTitle(String title) {
-    state.copyWith(title: title);
+    state.title = title;
   }
 
   void addDescription(String description) {
-    state.copyWith(description: description);
+    state.description = description;
   }
 
   void createTodo() {
-    state.copyWith(id: (random.nextInt(900000) + 100).toString());
+    state.id = (random.nextInt(900000) + 100).toString();
     HiveHelper.addTodoHive(state);
   }
 
