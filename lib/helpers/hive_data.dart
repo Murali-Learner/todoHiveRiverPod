@@ -6,9 +6,7 @@ class HiveData {
   static init() async {
     final appDocDir = await path_provider.getApplicationDocumentsDirectory();
     Hive.init(appDocDir.path);
-
     Hive.registerAdapter(TodoAdapter());
-
     await Hive.openBox<Todo>("todos");
   }
 }
